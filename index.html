@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+    <title>PCA - Reducción de Dimensiones y Detección de Anomalías</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <div class="title">
+          <h1>PCA: Reducción de dimensiones y detección de anomalías</h1>
+          <div class="meta">
+            Proyecto de algoritmos y álgebra lineal para ingeniería en TI
+            <span class="badge">Las maravillas de las TIC</span>
+          </div>
+        </div>
+        <div style="text-align: right">
+          <div style="font-weight: 700">Autor</div>
+          <div class="meta">Tu nombre - Curso</div>
+        </div>
+      </header>
+
+      <main>
+        <article class="card">
+          <div class="accent-line"></div>
+
+          <h2>Resumen</h2>
+          <p>
+            Implementación de PCA (Análisis de Componentes Principales) para
+            reducir dimensiones, visualizar datos en 3D y detectar anomalías
+            mediante proyección a subespacios. Aplicación: análisis de
+            rendimiento, detección de fallas y preprocesamiento para ML.
+          </p>
+
+          <h2>¿Para qué sirve?</h2>
+          <ul>
+            <li>Visualizar datos multidimensionales en 3D.</li>
+            <li>Identificar patrones y anomalías en el espacio proyectado.</li>
+            <li>Reducir ruido y dimensiones para modelos posteriores.</li>
+          </ul>
+
+          <h2>¿Qué hace el código?</h2>
+          <div class="code-block">
+            <div class="code-header">
+              <span>MATLAB – Sistema PCA Épico</span>
+              <button class="copy-btn" onclick="copyCode(this)">Copiar</button>
+            </div>
+            <div class="code-container">
+              <pre id="codigo-matlab"><code class="language-matlab">
+clc; clear; close all;
+
+% ================================================================
+%              SISTEMA DE PCA + VISUALIZACIÓN 3D
+%  Reducción de dimensionalidad usando Álgebra Lineal real
+% ================================================================
+
+disp('=== SISTEMA PCA EPICO ===');
+disp('Procesando informacion...');
+
+% ------------------------------------------------
+%     DATOS DE PRUEBA (puedes reemplazarlo
+%     por datos reales de TI, rendimiento, etc.)
+% ------------------------------------------------
+% rng(1); % para reproducibilidad
+% X = randn(100,5).* [3 1 0.5 2 4]; % 100 datos, 5 dimensiones
+
+
+% DATOS REALISTAS DE SERVIDOR (93 normales + 7 anomalías)
+X = [
+
+% CPU  RAM  LAT  CONN  TEMP
+
+% ---------------- NORMALES ----------------
+30  40  15  120  55
+35  42  16  130  56
+32  38  14  115  54
+28  36  13  110  53
+40  50  18  150  57
+33  41  17  125  55
+31  39  15  118  54
+37  45  19  140  56
+29  37  12  108  53
+34  43  16  128  55
+32  41  17  122  55
+39  47  20  145  57
+30  38  14  115  54
+36  44  18  138  56
+33  40  15  125  55
+31  39  16  118  54
+38  46  19  142  57
+29  36  13  110  53
+35  42  17  130  56
+30  38  14  115  54
+34  43  18  132  56
+31  39  16  120  55
+37  45  19  140  56
+28  35  12  108  53
+33  41  17  125  55
+30  38  15  118  54
+36  44  18  138  56
+32  40  16  122  55
+38  46  20  145  57
+29  36  13  110  53
+34  43  17  130  55
+31  39  15  118  54
+35  42  18  132  56
+33  41  17  125  55
+39  47  20  145  57
+30  38  14  115  54
+36  44  18  138  56
+31  39  16  120  55
+37  45  19  140  56
+29  36  13  108  53
+33  41  17  125  55
+32  40  16  122  55
+38  46  20  145  57
+28  35  12  108  53
+34  43  17  130  55
+30  38  14  115  54
+36  44  18  138  56
+33  41  17  125  55
+39  47  20  145  57
+31  39  15  118  54
+35  42  18  132  56
+32  40  16  122  55
+37  45  19  140  56
+30  38  14  115  54
+33  41  17  125  55
+29  36  13  110  53
+34  43  18  132  56
+32  40  16  122  55
+36  44  18  138  56
+30  38  15  118  54
+38  46  19  142  57
+29  36  13  110  53
+35  42  17  130  56
+33  41  17  125  55
+37  45  19  140  56
+30  38  15  118  54
+34  43  17  130  55
+31  39  15  118  54
+36  44  18  138  56
+33  41  17  125  55
+38  46  20  145  57
+28  35  12  108  53
+34  43  18  132  56
+32  40  16  122  55
+35  42  17  130  56
+30  38  14  115  54
+37  45  19  140  56
+29  36  13  110  53
+33  41  17  125  55
+
+% % ---------------- ANOMALIAS ----------------
+95   98   320   500   85   % CPU al maximo + latencia altísima
+88   90   250   480   82   % servidor sobrecargado
+15   20    15   600   60   % millones de conexiones (ataque)
+92   93    40   110   90   % temperatura absurda
+10   15   300   120   55   % latencia loca sin usar CPU (falla red)
+70   95    25   130   95   % RAM reventada por fuga
+50   60   200   300   70   % overload inestable
+
+];
+
+
+% ------------------------------------------------
+%         CENTRAR LOS DATOS
+% ------------------------------------------------
+mu = mean(X);
+Xc = X - mu;
+
+% ------------------------------------------------
+%      MATRIZ DE COVARIANZA
+% ------------------------------------------------
+C = (Xc' * Xc) / (size(Xc,1)-1);
+
+% ------------------------------------------------
+%       AUTOVALORES Y AUTOVECTORES
+% ------------------------------------------------
+[V, D] = eig(C);
+
+% ordenar de mayor a menor
+[autovalores, idx] = sort(diag(D), 'descend');
+V = V(:, idx);
+
+disp('=== AUTOVALORES ORDENADOS ===');
+disp(autovalores);
+
+% ------------------------------------------------
+%        SELECCION DE K COMPONENTES
+% ------------------------------------------------
+k = 3;  % componentes principales
+W = V(:, 1:k);
+
+% ------------------------------------------------
+%      PROYECCION AL SUBESPACIO k-D
+% ------------------------------------------------
+Z = Xc * W;  % datos proyectados
+
+% ------------------------------------------------
+%        RECONSTRUCCION APROXIMADA
+% ------------------------------------------------
+X_rec = Z * W' + mu;
+
+% ------------------------------------------------
+%               VISUALIZACION 3D
+% ------------------------------------------------
+figure('Name','PCA EPICO 3D','NumberTitle','off');
+scatter3(Z(:,1), Z(:,2), Z(:,3), 36, 'filled');
+title('DATOS PROYECTADOS EN 3 COMPONENTES PRINCIPALES');
+xlabel('PC1'); ylabel('PC2'); zlabel('PC3');
+grid on; hold on;
+
+% Dibujar los vectores propios más grandes
+scale = 3;
+for i = 1:3
+    quiver3(0,0,0, ...
+        W(1,i)*scale, W(2,i)*scale, W(3,i)*scale, ...
+        'LineWidth', 2, 'MaxHeadSize', 2);
+end
+
+legend('Datos proyectados','Ejes PCA');
+
+% ------------------------------------------------
+%      INFORMACION EXTRA EPICA
+% ------------------------------------------------
+explained_variance = autovalores / sum(autovalores);
+
+fprintf('\n===========================================\n');
+fprintf('VARIANZA EXPLICADA POR COMPONENTE:\n');
+for i = 1:length(explained_variance)
+    fprintf('PC%d: %.2f%%\n', i, explained_variance(i)*100);
+end
+fprintf('===========================================\n');
+
+disp('Reconstruccion de los primeros 5 datos (aprox.):');
+disp(X_rec(1:5,:));
+  </code></pre>
+            </div>
+            <button id="verMasBtn">VER MÁS</button>
+          </div>
+
+          <div class="steps">
+            <div class="step">1. Centra los datos: Xc = X - mean(X)</div>
+            <div class="step">
+              2. Calcula la matriz de covarianza: C = (Xc' * Xc)/(n-1)
+            </div>
+            <div class="step">
+              3. Resuelve eig(C): obtiene autovalores y autovectores
+            </div>
+            <div class="step">
+              4. Ordena componentes, proyecta a k dimensiones y reconstruye
+            </div>
+            <div class="step">
+              5. Muestra gráficos 3D y métricas (varianza explicada, ángulos)
+            </div>
+          </div>
+
+          <h2>La parte de álgebra lineal (resumen)</h2>
+          <div class="formula">
+            C = cov(X) &nbsp; &nbsp; V D V' = C &nbsp; &nbsp; Z = Xc * W &nbsp;
+            &nbsp; X_rec = Z * W' + mean(X)
+          </div>
+
+          <h2>Cómo identificar anomalías</h2>
+          <p>
+            En el espacio proyectado (Z), los puntos que quedan muy distantes
+            del centro o del clúster principal son sospechosos. Recomendaciones
+            prácticas:
+          </p>
+          <ul>
+            <li>
+              Calcular distancias euclidianas a la media en el espacio PC: d_i =
+              ||z_i - mean(Z)||
+            </li>
+            <li>
+              Marcar como anomalía si d_i > umbral (ej: media + 3*desv.est.)
+            </li>
+            <li>
+              Otra opción: usar distancia Mahalanobis para considerar la
+              covarianza
+            </li>
+          </ul>
+
+          <h2>Ejecuciones y capturas</h2>
+          <p>Se realizaron dos ejecuciones con dos bases de datos diferentes</p>
+
+          <div class="two-captures">
+            <figure class="capture">
+              <img src="run1.png" alt="Captura ejecución 1" />
+              <div class="hint">
+                Captura 1: ejemplo de datos automatizados (mayoría de puntos
+                dispersos).
+              </div>
+            </figure>
+
+            <figure class="capture">
+              <img src="run2.png" alt="Captura ejecución 2" />
+              <div class="hint">Captura 2: ejemplo con anomalías visibles.</div>
+            </figure>
+          </div>
+
+          <h2>Notas sobre las capturas</h2>
+          <ul>
+            <li>
+              En la primera captura, los puntos aparecen más dispersos en el
+              espacio tridimensional, lo que dificulta distinguir con precisión
+              cuáles corresponden a anomalías reales, ya que no existe un grupo
+              dominante claramente definido.
+            </li>
+            <li>
+              En cambio, en la segunda captura, la mayoría de puntos quedan
+              concentrados en una misma región, mientras que unos cuantos se
+              alejan de ese grupo común. Estos puntos aislados son fácilmente
+              identificables como anomalías.
+            </li>
+            <li>
+              Es importante destacar que todos los puntos azules representan los
+              datos originales reducidos de 5 dimensiones a 3 mediante PCA, lo
+              que permite visualizarlos y analizarlos gráficamente en un entorno
+              tridimensional.
+            </li>
+          </ul>
+          <div
+            id="plot3d"
+            style="
+              width: 100%;
+              height: 500px;
+              border: 1px solid #444;
+              border-radius: 10px;
+            "
+          ></div>
+
+          <footer>
+            Esto es todo.
+            <b><br />Gracias por leer este artìculo</b>
+          </footer>
+        </article>
+
+        <aside class="sticky">
+          <h3>Resumen rápido</h3>
+
+          <!-- KPIs clave -->
+          <div class="kpi" style="margin-bottom: 12px">
+            <div class="k">
+              <b>Dataset</b>
+              <div style="color: var(--muted); font-size: 13px">
+                Ejemplo: servidor / 100 muestras
+              </div>
+            </div>
+            <div class="k">
+              <b>Dimensiones</b>
+              <div style="color: var(--muted); font-size: 13px">
+                5 características (CPU,RAM,LAT,CONN,TEMP)
+              </div>
+            </div>
+            <div class="k">
+              <b>Muestras</b>
+              <div style="color: var(--muted); font-size: 13px">
+                100 (ejemplo)
+              </div>
+            </div>
+            <div class="k">
+              <b>Anomalías</b>
+              <div style="color: var(--muted); font-size: 13px">
+                7 (ejemplo)
+              </div>
+            </div>
+            <div class="k">
+              <b>PC retenidas</b>
+              <div style="color: var(--muted); font-size: 13px">k = 3</div>
+            </div>
+          </div>
+
+          <!-- Cómo reproducir -->
+          <h3>Reproducir (comandos rápidos)</h3>
+          <ol style="color: var(--muted); margin-bottom: 12px">
+            <li>
+              Guarde el script MATLAB como <b>pca_Reduc_dimen.m</b> en la misma
+              carpeta.
+            </li>
+            <li>
+              En MATLAB: <code class="code">>> run('pca_Reduc_dimen.m')</code> o
+              <code class="code">>> pca_Reduc_dimen</code>
+            </li>
+            <li>
+              Para guardar la figura generada:<br />
+              <code class="code">saveas(gcf,'run1.png')</code> o
+              <code class="code">exportgraphics(gcf,'run1.png')</code>
+            </li>
+            <li>
+              Si usa datos reales, reemplaze
+              <code class="code">X = ...</code> por tu matriz (n×d).
+            </li>
+          </ol>
+
+          <!-- Métricas y cómo interpretarlas -->
+          <h3>Métricas e interpretación</h3>
+          <p style="color: var(--muted); margin-bottom: 8px">
+            Qué mirar en la entrega:
+          </p>
+          <ul style="margin-bottom: 12px">
+            <li>
+              <b>Varianza explicada:</b> indica cuánto conserva cada PC. Calcula
+              en MATLAB con:<br />
+              <code class="code">
+                explained_variance = autovalores / sum(autovalores)</code
+              >
+              Sustituye los valores en la página (PC1, PC2, PC3 → %).
+            </li>
+            <li>
+              <b>Distancia en espacio PC (indicador simple de anomalía):</b
+              ><br />
+              <code class="code">
+                d = vecnorm(Z - mean(Z), 2, 2); % distancia euclidea de cada
+                punto</code
+              >
+              <b>Umbral práctico:</b><br />
+              <code class="code">umbral = mean(d) + 3*std(d)</code>
+              . Si <code>d(i) &gt; umbral</code> → posible anomalía.
+            </li>
+            <li>
+              <b>Distancia Mahalanobis (más riguroso):</b><br />
+              <code class="code">
+                MD = mahal(Z,Z); % devuelve distancias Mahalanobis</code
+              >
+              Umbral estadístico opcional: comparar con distrib. chi-cuadrado
+              con k grados de libertad.
+            </li>
+          </ul>
+
+          <!-- Archivos entregables -->
+          <h3>Archivos entregados</h3>
+          <div style="color: var(--muted); margin-bottom: 12px">
+            <ul>
+              <li><a>index.html</a> (página de presentación)</li>
+              <li><b>pca_Reduc_dimen.m</b> (script MATLAB)</li>
+              <li>
+                <b>run1.png</b> y <b>run2.png</b> (capturas de la ejecución)
+              </li>
+            </ul>
+          </div>
+
+          <!-- Nota del autor / interpretación -->
+          <h3>Notas de interpretación</h3>
+          <p style="color: var(--muted); font-size: 13px">
+            - Los puntos alejados en la proyección PC suelen indicar eventos
+            atípicos (fugas, sobrecarga, ataques).<br />
+            - Compare siempre la reconstrucción (X_rec) con los datos originales
+            para entender qué dimensiones aportan el error.<br />
+            - Use la varianza explicada para justificar la elección de k (si
+            PC1+PC2+PC3 explican &gt;70% es buena señal).
+          </p>
+
+          <!-- Contacto y referencia -->
+          <div style="height: 10px"></div>
+          <h3>Contacto y referencias</h3>
+          <p style="color: var(--muted); font-size: 13px; margin-bottom: 6px">
+            Autor: Victor Samuel Ararat Castro — Email: vararatc@unemi.edu.ec
+          </p>
+          <p style="color: var(--muted); font-size: 12px">
+            Referencias: PCA (Hotelling 1933), Mahalanobis (1936), técnicas
+            modernas de detección de anomalías.
+          </p>
+        </aside>
+      </main>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+    <script src="https://unpkg.com/three@0.164.1/build/three.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="./coor.js"></script>
+  </body>
+  <script src="./script.js"></script>
+</html>
